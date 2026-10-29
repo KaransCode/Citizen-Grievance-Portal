@@ -1,0 +1,60 @@
+{
+  "info": {
+    "name": "CivicConnect API",
+    "description": "Starter requests for the Citizen Grievance Reporting and Resolution Portal. Keep the Postman cookie jar enabled. Run Get CSRF before authenticated write requests and pass the returned token in X-CSRF-Token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000" },
+    { "key": "categoryId", "value": "REPLACE_WITH_CATEGORY_UUID" },
+    { "key": "departmentId", "value": "REPLACE_WITH_DEPARTMENT_UUID" },
+    { "key": "complaintId", "value": "REPLACE_WITH_COMPLAINT_UUID" },
+    { "key": "csrfToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        { "name": "API health", "request": { "method": "GET", "url": "{{baseUrl}}/api/health" } },
+        { "name": "Get CSRF token", "event": [{ "listen": "test", "script": { "exec": ["const body = pm.response.json();", "if (body.csrfToken) pm.collectionVariables.set('csrfToken', body.csrfToken);"] } }], "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/csrf" } }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        { "name": "Register citizen", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Demo Citizen\",\n  \"email\": \"citizen@example.com\",\n  \"password\": \"A-secure-demo-password-42\",\n  \"phone\": \"\",\n  \"smsOptIn\": false\n}" }, "url": "{{baseUrl}}/api/auth/register" } },
+        { "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@civicportal.local\",\n  \"password\": \"AdminDemo123!\"\n}" }, "url": "{{baseUrl}}/api/auth/login" } },
+        { "name": "Current user", "request": { "method": "GET", "url": "{{baseUrl}}/api/auth/me" } },
+        { "name": "Logout", "request": { "method": "POST", "header": [{ "key": "X-CSRF-Token", "value": "{{csrfToken}}" }], "url": "{{baseUrl}}/api/auth/logout" } }
+      ]
+    },
+    {
+      "name": "Lookups",
+      "item": [
+        { "name": "Categories", "request": { "method": "GET", "url": "{{baseUrl}}/api/categories" } },
+        { "name": "Departments", "request": { "method": "GET", "url": "{{baseUrl}}/api/departments" } }
+      ]
+    },
+    {
+      "name": "Complaints",
+      "item": [
+        { "name": "Create complaint", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Broken streetlight near the park\",\n  \"description\": \"The streetlight has been off for several nights and the footpath is difficult to use after sunset.\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"address\": \"Near Community Park gate, Model Town\",\n  \"ward\": \"Ward 12\",\n  \"priority\": \"NORMAL\"\n}" }, "url": "{{baseUrl}}/api/complaints" } },
+        { "name": "List complaints", "request": { "method": "GET", "url": "{{baseUrl}}/api/complaints?limit=20&page=1" } },
+        { "name": "Complaint summary", "request": { "method": "GET", "url": "{{baseUrl}}/api/complaints/summary" } },
+        { "name": "Complaint detail", "request": { "method": "GET", "url": "{{baseUrl}}/api/complaints/{{complaintId}}" } },
+        { "name": "Assign department (admin)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }], "body": { "mode": "raw", "raw": "{\n  \"departmentId\": \"{{departmentId}}\",\n  \"note\": \"Please inspect during the next ward visit.\"\n}" }, "url": "{{baseUrl}}/api/admin/complaints/{{complaintId}}/assign-department" } },
+        { "name": "Mark under review (admin)", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"UNDER_REVIEW\",\n  \"note\": \"Initial details reviewed.\"\n}" }, "url": "{{baseUrl}}/api/admin/complaints/{{complaintId}}/update-status" } },
+        { "name": "Update status (department/admin)", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }], "body": { "mode": "raw", "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"note\": \"Field team is inspecting the issue.\"\n}" }, "url": "{{baseUrl}}/api/complaints/{{complaintId}}/status" } }
+      ]
+    },
+    {
+      "name": "Dashboards and notifications",
+      "item": [
+        { "name": "Admin dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/api/admin/dashboard" } },
+        { "name": "Admin analytics", "request": { "method": "GET", "url": "{{baseUrl}}/api/admin/analytics" } },
+        { "name": "Department dashboard", "request": { "method": "GET", "url": "{{baseUrl}}/api/department/dashboard" } },
+        { "name": "My notifications", "request": { "method": "GET", "url": "{{baseUrl}}/api/notifications" } }
+      ]
+    }
+  ]
+}

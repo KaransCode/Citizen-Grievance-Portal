@@ -1,0 +1,30 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.2", nodesep="0.35", ranksep="0.55", fontname="Arial", label="CORE ENTITY RELATIONSHIP DIAGRAM", labelloc=t, fontsize=18, fontcolor="#164e63"];
+  node [shape=record, style="filled", fontname="Arial", fontsize=9, color="#c7dfe0", fillcolor="#f7fbfb", fontcolor="#173a46", margin="0.08,0.05"];
+  edge [color="#4a9190", penwidth=1.2, arrowsize=0.7, fontsize=8, fontname="Arial"];
+  users [label="{Users|PK id : UUID\lname, email, password_hash\lrole, department_id FK\l}"];
+  departments [label="{Departments|PK id : UUID\lname, code, is_active\l}"];
+  categories [label="{ComplaintCategories|PK id : UUID\lname, default_priority\l}"];
+  statuses [label="{ComplaintStatuses|PK code\llabel, is_terminal\l}"];
+  complaints [label="{Complaints|PK id : UUID\lreference_no UNIQUE\lcitizen_id FK, category_id FK\lstatus_code FK, assigned_department_id FK\ltitle, description, address, priority\l}", fillcolor="#e1f6ed", color="#90d9c4"];
+  assignments [label="{ComplaintAssignments|PK id : UUID\lcomplaint_id FK, department_id FK\lassigned_by FK, assigned_to FK\l}"];
+  attachments [label="{ComplaintAttachments|PK id : UUID\lcomplaint_id FK, uploaded_by FK\lurl, storage_key, size_bytes\l}"];
+  history [label="{ComplaintStatusHistory|PK id : BIGSERIAL\lcomplaint_id FK, from/to status FK\lchanged_by FK, note, created_at\l}"];
+  notifications [label="{Notifications|PK id : UUID\luser_id FK, complaint_id FK\lchannel, message, read_at\l}"];
+  audit [label="{AuditLogs|PK id : BIGSERIAL\lactor_id FK, action, entity_type/id\lmetadata JSONB, created_at\l}"];
+  pwreset [label="{PasswordResetTokens|PK id : UUID\luser_id FK, token_hash UNIQUE\lexpires_at, used_at\l}"];
+  departments -> users [label="1 to many"];
+  users -> complaints [label="citizen 1 to many"];
+  categories -> complaints [label="1 to many"];
+  statuses -> complaints [label="1 to many"];
+  departments -> complaints [label="assigned team"];
+  complaints -> assignments [label="1 to many"];
+  departments -> assignments [label="1 to many"];
+  users -> assignments [label="actor/officer"];
+  complaints -> attachments [label="1 to many"];
+  complaints -> history [label="1 to many"];
+  users -> notifications [label="1 to many"];
+  complaints -> notifications [label="0..many"];
+  users -> audit [label="actor"];
+  users -> pwreset [label="1 to many"];
+}

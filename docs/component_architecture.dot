@@ -1,0 +1,9 @@
+digraph G {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.36", ranksep="0.5", fontname="Arial", label="LOW-LEVEL COMPONENT ARCHITECTURE", labelloc=t, fontsize=18, fontcolor="#164e63"];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, color="#c7dfe0", fillcolor="#f7fbfb", fontcolor="#173a46", margin="0.14,0.10"];
+  edge [color="#428c8a", penwidth=1.2, arrowsize=0.75];
+  subgraph cluster_front {label="Frontend · React"; color="#cce7e3"; style="rounded"; home[label="Home / Category listing"]; authui[label="Login / Register / Reset"]; citizen[label="Citizen dashboard + complaint form"]; ops[label="Admin / Department workspace"];}
+  subgraph cluster_api {label="Backend · Express"; color="#cfe0f5"; style="rounded"; api[label="API router + schemas"]; auth[label="Auth / RBAC / CSRF"]; complaint[label="Complaint workflow service"]; upload[label="Image processing / storage"]; analytics[label="Admin analytics / audit"]; notification[label="Notification service"];}
+  subgraph cluster_data {label="Persistence"; color="#eadcb9"; style="rounded"; pg[label="PostgreSQL",shape=cylinder,fillcolor="#fff4dd"]; cloud[label="Cloud storage",shape=folder,fillcolor="#f1eaff"]; provider[label="SMTP / SMS",fillcolor="#fff0f0"];}
+  home -> api; authui -> api; citizen -> api; ops -> api; api -> auth; api -> complaint; api -> upload; api -> analytics; api -> notification; auth -> pg; complaint -> pg; analytics -> pg; upload -> cloud; notification -> pg; notification -> provider;
+}

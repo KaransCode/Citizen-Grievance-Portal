@@ -1,0 +1,19 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.35", ranksep="0.42", fontname="Arial", label="COMPLAINT LIFECYCLE AND STATUS WORKFLOW", labelloc=t, fontsize=18, fontcolor="#164e63"];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=10, color="#c7dfe0", fillcolor="#f4fbfa", fontcolor="#173a46", margin="0.2,0.12"];
+  edge [color="#428c8a", penwidth=1.4, arrowsize=0.8, fontname="Arial", fontsize=9];
+  submitted [label="SUBMITTED\nCitizen files report", fillcolor="#e5efff", color="#bacdf2"];
+  review [label="UNDER REVIEW\nAdmin validates details", fillcolor="#fff5df", color="#edd9a4"];
+  assigned [label="ASSIGNED\nDepartment and officer selected", fillcolor="#eaeaff", color="#c5c5f5"];
+  progress [label="IN PROGRESS\nDepartment records work", fillcolor="#e2f3ff", color="#b3ddef"];
+  resolved [label="RESOLVED\nResolution note is required", fillcolor="#ddf7ea", color="#b5e6cb"];
+  closed [label="CLOSED\nFinal state", fillcolor="#d9f4eb", color="#8dd2bd"];
+  rejected [label="REJECTED\nReason is required", fillcolor="#ffe9e8", color="#f0c3c0"];
+  submitted -> review; review -> assigned; assigned -> progress; progress -> resolved; resolved -> closed;
+  submitted -> rejected [label="invalid / out of scope", color="#c96565", fontcolor="#a74e4e"];
+  review -> rejected [label="reject with reason", color="#c96565", fontcolor="#a74e4e"];
+  assigned -> rejected [label="reject with reason", color="#c96565", fontcolor="#a74e4e"];
+  progress -> rejected [label="reject with reason", color="#c96565", fontcolor="#a74e4e"];
+  resolved -> progress [label="re-open / more work", style=dashed];
+  {rank=same; rejected; closed;}
+}

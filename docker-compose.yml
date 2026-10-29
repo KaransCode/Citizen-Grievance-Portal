@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: cgrp-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: citizen_grievance
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - cgrp_postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d citizen_grievance"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  cgrp_postgres_data:

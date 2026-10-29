@@ -1,0 +1,19 @@
+digraph G {
+  graph [rankdir=TB, bgcolor="white", pad="0.25", nodesep="0.45", ranksep="0.55", fontname="Arial", label="HIGH-LEVEL ARCHITECTURE", labelloc=t, fontsize=20, fontcolor="#164e63"];
+  node [shape=box, style="rounded,filled", fontname="Arial", fontsize=11, color="#c7dfe0", fillcolor="#f4fbfa", fontcolor="#173a46", margin="0.18,0.12"];
+  edge [color="#428c8a", penwidth=1.5, arrowsize=0.8, fontname="Arial", fontsize=9, fontcolor="#49666d"];
+  citizen [label="Citizen / Department / Admin\nWeb Browser", fillcolor="#dff7ef", color="#8cd6c7"];
+  frontend [label="React + Vite UI\nResponsive screens + client validation"];
+  api [label="HTTPS REST API\nNode.js + Express", fillcolor="#e4f0ff", color="#b3c9f1"];
+  auth [label="Authentication & Policy Layer\nJWT session cookie · RBAC · CSRF · rate limit"];
+  db [shape=cylinder, label="PostgreSQL\nUsers · Complaints · Assignments\nStatuses · Notifications · Audit logs", fillcolor="#fff4dd", color="#ead19a"];
+  store [shape=folder, label="Image Storage\nCloudinary / S3\nLocal disk for development", fillcolor="#f1eaff", color="#d2c0ef"];
+  notify [label="Notification providers\nIn-app · SMTP email · SMS provider", fillcolor="#fff0f0", color="#edc2c2"];
+  citizen -> frontend [label="HTTPS"];
+  frontend -> api [label="JSON / multipart"];
+  api -> auth [label="middleware"];
+  auth -> db [label="parameterized SQL"];
+  api -> store [label="compressed images"];
+  api -> notify [label="status events"];
+  {rank=same; db; store; notify;}
+}

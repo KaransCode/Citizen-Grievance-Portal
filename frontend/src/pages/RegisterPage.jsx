@@ -1,0 +1,22 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, CheckCircle2, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
+import { api } from '../api.js';
+import { useAuth } from '../auth-context.jsx';
+import { ErrorNotice } from '../components/Shared.jsx';
+
+export default function RegisterPage() {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '', smsOptIn: false });
+  const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
+  const { setUser, setNotice } = useAuth(); const navigate = useNavigate();
+  const update = (key,value) => setForm((old)=>({...old,[key]:value}));
+  const submit = async (event) => {
+    event.preventDefault(); setError('');
+    if (form.password !== form.confirmPassword) return setError('The passwords do not match.');
+    if (form.password.length < 10) return setError('Use at least 10 characters for your password.');
+    setBusy(true);
+    try { const result = await api('/auth/register',{method:'POST',body:{name:form.name,email:form.email,phone:form.phone,password:form.password,smsOptIn:form.smsOptIn}}); setUser(result.user); setNotice('Your account is ready.'); navigate('/dashboard'); }
+    catch(err){setError(err.message);} finally{setBusy(false);}
+  };
+  return <main className="register-page"><div className="container register-grid"><div className="register-intro"><div className="eyebrow">BE PART OF THE CHANGE</div><h1>Better neighbourhoods<br/><span>begin with you.</span></h1><p>Create an account to report local issues, keep your complaint reference numbers together, and follow updates from the responsible department.</p><div className="register-benefits"><div><span><CheckCircle2 size={17}/></span><div><strong>One place for every report</strong><small>Keep a clear history of your civic concerns.</small></div></div><div><span><CheckCircle2 size={17}/></span><div><strong>Updates you can follow</strong><small>See status changes and resolution notes.</small></div></div><div><span><CheckCircle2 size={17}/></span><div><strong>Privacy matters</strong><small>Your account is protected by secure authentication.</small></div></div></div></div><form className="register-form card-panel" onSubmit={submit}><div className="eyebrow">GET STARTED</div><h2>Create your account</h2><p className="form-subtitle">Fields marked with * are required.</p><ErrorNotice message={error}/><label className="field-label">Full name *</label><div className="input-with-icon"><UserRound size={17}/><input value={form.name} onChange={(e)=>update('name',e.target.value)} placeholder="Enter your full name" autoComplete="name" required minLength={2} maxLength={120}/></div><label className="field-label">Email address *</label><div className="input-with-icon"><Mail size={17}/><input type="email" value={form.email} onChange={(e)=>update('email',e.target.value)} placeholder="you@example.com" autoComplete="email" required maxLength={254}/></div><label className="field-label">Phone number <span className="muted-inline">(optional)</span></label><div className="input-with-icon"><Phone size={17}/><input type="tel" value={form.phone} onChange={(e)=>update('phone',e.target.value)} placeholder="For optional SMS updates" maxLength={25}/></div><label className="field-label">Password *</label><div className="input-with-icon"><LockKeyhole size={17}/><input type="password" value={form.password} onChange={(e)=>update('password',e.target.value)} placeholder="At least 10 characters" autoComplete="new-password" minLength={10} maxLength={128} required/></div><label className="field-label">Confirm password *</label><div className="input-with-icon"><LockKeyhole size={17}/><input type="password" value={form.confirmPassword} onChange={(e)=>update('confirmPassword',e.target.value)} placeholder="Enter password again" autoComplete="new-password" minLength={10} maxLength={128} required/></div><label className="consent-check"><input type="checkbox" checked={form.smsOptIn} onChange={(e)=>update('smsOptIn',e.target.checked)}/><span>I'd like to receive SMS updates about my complaints (optional; requires a configured service).</span></label><button className="btn btn-primary btn-full btn-lg auth-submit" disabled={busy}>{busy?'Creating account…':'Create account'} <ArrowRight size={17}/></button><div className="auth-switch">Already registered? <Link to="/login">Sign in</Link></div></form></div></main>;
+}

@@ -1,0 +1,2 @@
+-- Reference seed data lives in schema.sql so a clean database receives lookup rows.
+-- Demo identities are inserted by backend/scripts/seed.js using bcrypt-hashed passwords.
